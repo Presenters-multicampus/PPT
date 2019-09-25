@@ -36,7 +36,7 @@
 
 ## Introduce Team member
 
-- 조윤기 (@joyoon729)
-- 강태형 (@gtpgg1013)
-- 박여진 (@YJEEEN)
-- 차호진 (@aporlo21)
+- 조윤기 ([joyoon729](https://github.com/joyoon729))
+- 강태형 ([gtpgg1013](https://github.com/gtpgg1013))
+- 박여진 ([YJEEEN](https://github.com/YJEEEN))
+- 차호진 ([aporlo21](https://github.com/aporlo21))
