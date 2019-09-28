@@ -224,4 +224,7 @@ dmypy.json
 *.vob
 *.wmv
 
+### Trained caffe Model ###
+*.caffemodel
+
 # End of https://www.gitignore.io/api/video,python,pycharm,jupyternotebooks
