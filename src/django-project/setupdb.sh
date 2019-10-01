@@ -1,5 +1,7 @@
-#!bin/bash
-source env/bin/activate
+
+python3 -m venv env
+. env/bin/activate
+pip install django requests Pillow
 
 echo -e "\ncreate database..."
 python manage.py migrate > /dev/null 2>&1
