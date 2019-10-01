@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div>
+    <a href="{% url 'file_new' %}" class='top-menu'>add file <span class='glyphicon glyphicon-plus'></span></a>
+    <p>file list</p>
+    {% if files %}
+        {% for file in files %}
+            <h3>{{file.title}}</h3>
+            <p>{{file.file.url}}</p>
+            <img src='{{file.file.url}}' alt=''>
+            <video width="70%" controls>
+                <source src="{{file.file.url}}" type="video/mp4">
+            </video>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
