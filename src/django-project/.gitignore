@@ -2,6 +2,11 @@
 # Created by https://www.gitignore.io/api/venv,code,python
 # Edit at https://www.gitignore.io/?templates=venv,code,python
 
+### db ###
+db.sqlite3
+migrations/
+/media/
+
 ### Code ###
 .vscode/*
 # !.vscode/settings.json

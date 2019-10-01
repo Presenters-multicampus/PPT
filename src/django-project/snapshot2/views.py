@@ -5,7 +5,13 @@ from .forms import FileForm
 # Create your views here.
 def home(request):
     files = FileModel.objects.all()
-    return render(request, 'home.html', {'files':files})
+    data = []
+    for file in files:
+        if file.file.url[-3:] == 'mp4':
+            data.append([file, True])
+        else:
+            data.append([file, False])
+    return render(request, 'home.html', {'data':data})
 
 def file_new(request):
     files = FileModel.objects.all()

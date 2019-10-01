@@ -2,16 +2,18 @@
 {% load static %}
 {% block content %}
 <div>
-    <a href="{% url 'file_new' %}" class='top-menu'>add file <span class='glyphicon glyphicon-plus'></span></a>
-    <p>file list</p>
-    {% if files %}
-        {% for file in files %}
-            <h3>{{file.title}}</h3>
-            <p>{{file.file.url}}</p>
-            <img src='{{file.file.url}}' alt=''>
-            <video width="70%" controls>
-                <source src="{{file.file.url}}" type="video/mp4">
+    <h3><a href="{% url 'file_new' %}" class='top-menu'> <span class='glyphicon glyphicon-plus'></span> add file</a></h3>
+    {% if data %}
+        {% for d in data %}
+            <h3>{{d.0.title}}</h3>
+            {% if d.1 %}
+            <video height="30%" controls>
+                <source src="{{d.file.url}}" type="video/mp4">
             </video>
+            {% else %}
+            <img src='{{d.0.file.url}}' alt='' height="30%">
+            {% endif %}
+            <p class='url'>{{d.0.file.url}}</p>   
         {% endfor %}
     {% endif %}
 </div>
