@@ -16,6 +16,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+SNAPS_DIR = os.path.join(BASE_DIR, 'snapshot2/static/snapshots')
 MEDIA_DIR = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/'  # models 에서 upload_to 와 사용시 media/media 가 되어서 '/' 로 바꾸었음
 

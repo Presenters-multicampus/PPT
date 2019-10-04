@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    {% if data %}
+        <div>
+            <p>{{data.file.url}}</p>
+            <video height="30%" contros>
+                <source src="{{ data.file.url }}" type='video/mp4'>
+            </video>
+        </div>
+    {% endif %}
+    <div>
+        {% if snapshots %}
+            <ul>
+            {% for snapshot in snapshots %}
+                <li>
+                    <img src="{% static snapshot %}" alt='' height='30%'>
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <div>
+        {% if snapshot %}
+            
+        {% endif %}
+    </div>
+{% endblock %}
