@@ -6,7 +6,7 @@ from .coco import getSkeleton
 
 def snapshot(url, SEC=3):
     filename = os.path.basename(url)
-    url = os.path.join(settings.MEDIA_DIR, filename)
+    url = os.path.join(settings.MEDIA_ROOT, filename)
     cap = cv2.VideoCapture(url)
     save_dir = os.path.join(settings.SNAPS_DIR, filename)
 

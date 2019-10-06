@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div></div>
+    <h2>{{ video.title }}</h2>
+    {% if video.file %}
+        <img src="{{ video.file.url }}" alt="">
+        <video height="30%" controls autoplay>
+            <source src="{{video.file.url}}">
+        </video>
+    {% endif %}
+    {% if snapshots %}
+        <ul>
+        {% for snapshot in snapshots %}
+            <li>
+                <img src="{% static snapshot %}" alt='' height='30%'>
+                <p>발표 점수가 여기에 표시됩니다...</p>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}
