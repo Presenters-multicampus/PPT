@@ -2,6 +2,9 @@
 # Created by https://www.gitignore.io/api/venv,code,python
 # Edit at https://www.gitignore.io/?templates=venv,code,python
 
+### models ###
+caffemodel/
+
 ### db ###
 db.sqlite3
 migrations/

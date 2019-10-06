@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os, shutil
 from django.conf import settings
+from .coco import getSkeleton
 
 def snapshot(url, SEC=3):
     filename = os.path.basename(url)
@@ -27,6 +28,7 @@ def snapshot(url, SEC=3):
 
         # saves image of the current frame in jpg file
         if cf%(fps*SEC) == 0:
+            frame, _, _ = getSkeleton(frame)
             name = os.path.join(save_dir, f'{str(cf)}.jpg')
             print(f'Creating... {name}')
             cv2.imwrite(name, frame)

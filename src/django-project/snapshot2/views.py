@@ -33,7 +33,7 @@ def file_new(request):
             form.save()
             files = FileModel.objects.all()
             url = files[len(files)-1].file.url
-            save_dir = snapshot(url, 20)
+            save_dir = snapshot(url, 3)  # 두번째 인자가 SEC, '몇초마다 snapshot 할지 결정'
             return redirect('home')
     else:
         form = FileForm()
