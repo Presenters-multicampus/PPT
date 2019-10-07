@@ -239,5 +239,6 @@ fer2013.csv
 !model_v6_23.hdf5 # small model
 *.hdf5
 *.h5
+!model_v6_23.hdf5 # small model
 
 # End of https://www.gitignore.io/api/video,python,pycharm,jupyternotebooks
