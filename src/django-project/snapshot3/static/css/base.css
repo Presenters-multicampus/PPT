@@ -1,0 +1,16 @@
+body {
+    margin-left: 5%;
+    margin-right: 5%
+}
+
+div {
+    padding-bottom: 20px
+}
+
+.url {
+    color:white;
+}
+
+.admin {
+    text-align: right
+}
