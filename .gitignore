@@ -236,6 +236,7 @@ dmypy.json
 fer2013.csv
 
 ### trained model file ###
+!model_v6_23.hdf5 # small model
 *.hdf5
 *.h5
 
