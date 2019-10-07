@@ -13,7 +13,6 @@ def home(request):
     files = FileModel.objects.all()
     return render(request, 'home.html', {'files':files})
 
-# @app.task
 def video_new(request):
     if request.method == 'POST':
         file = FileModel()
