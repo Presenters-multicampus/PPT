@@ -227,4 +227,15 @@ dmypy.json
 ### Trained caffe Model ###
 *.caffemodel
 
+## Image ###
+*.jpg
+*.jpeg
+*.PNG
+
+### face data csv ###
+fer2013.csv
+
+### trained model file ###
+*.h5
+
 # End of https://www.gitignore.io/api/video,python,pycharm,jupyternotebooks
