@@ -1,0 +1,14 @@
+{% load static %}
+<html>
+    <head>
+        <title>PPT</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel='stylesheet' href="{% static 'css/base.css' %}">
+        <link rel='stylesheet' href="{% static 'css/nav.css' %}">
+    </head>
+    <body>
+        <a href='/'><h1 id='title'>PPT (Personal Presentation Trainer)</h1></a>
+        {% block content %}
+        {% endblock %}
+    </body>
+</html>
