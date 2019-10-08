@@ -30,8 +30,11 @@ SECRET_KEY = 'ek-kc5!bk%%8tcu*07c=*r*!pe)l07sq@ozti75h7&!x5$kfp4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['3.90.59.94']
+ALLOWED_HOSTS = ['127.0.0.1', '3.90.59.94']
 
+# redis, celery settings
+# BROKER_URL = 'redis://localhost:6379/0'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 # Application definition
 

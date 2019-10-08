@@ -2,22 +2,31 @@
 {% load static %}
 
 {% block content %}
-    <div></div>
-    <h2>{{ video.title }}</h2>
-    {% if video.file %}
-        <img src="{{ video.file.url }}" alt="">
-        <video height="30%" controls autoplay>
-            <source src="{{video.file.url}}">
-        </video>
-    {% endif %}
-    {% if snapshots %}
-        <ul>
-        {% for snapshot in snapshots %}
-            <li>
-                <img src="{% static snapshot %}" alt='' height='30%'>
+    <div id="main">
+        <div></div>
+        <h2>{{ video.title }}</h2>
+        {% if video.file %}
+            <img src="{{ video.file.url }}" alt="">
+            <video id='video1' height="30%" controls autoplay>
+                <source src="{{video.file.url}}">
+            </video>
+            {% if sec %}
+            <script>
+                document.getElementById('video1').currentTime = {{sec}};
+            </script>
+            {% endif %}
+        {% endif %}
+        {% if snapshots %}
+            <div id="mySidenav" class="sidenav">
+                {% for snapshot in snapshots %}
+                    <a href="/video/{{video.pk}}/{{snapshot.0}}"><img src="{% static snapshot.1 %}" width='85%'></a>
+                {% endfor %}
+            </div>
+            <div></div>
+            {% if snap %}
+                <img src="{% static snap %}" height="30%">
                 <p>발표 점수가 여기에 표시됩니다...</p>
-            </li>
-        {% endfor %}
-        </ul>
-    {% endif %}
+            {% endif %}
+        {% endif %}
+    </div>
 {% endblock %}
