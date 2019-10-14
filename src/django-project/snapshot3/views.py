@@ -14,6 +14,8 @@ def home(request):
     files = FileModel.objects.all()
     return render(request, 'home.html', {'files':files})
 
+# 새 video 추가 및 'snapshot' 함수 실행
+# split, object inferencing
 def video_new(request):
     if request.method == 'POST':
         file = FileModel()
@@ -58,21 +60,26 @@ def video_snapshot(request, pk, idx):
     # [[index, snapshot], [index, snapshot], ... ] 형태의 리스트로 변환
     snapshots = [[idx, snapshot] for idx, snapshot in enumerate(snapshots)]
 
-    # read emotions
+    # read snap_info.txt
+    # snapshot 함수에서 snap_info.txt 작성하고, 여기서 불러옵니다.
     emo_list = []
-    emo_path = os.path.join(snaps_dir, 'emotions.txt')
-    with open(emo_path, 'r') as f:
+    sco_list = []
+    info_path = os.path.join(snaps_dir, 'snap_info.txt')
+    with open(info_path, 'r') as f:
         while True:
             line = f.readline()
             if not line:
                 break
-            emo_list.append(line.strip())
+            emo = line.split(',')[0].strip()
+            sco = line.split(',')[1].strip()
+            emo_list.append(emo)
+            sco_list.append(sco)
 
-    snapshot = [dict_snapshots[idx], emo_list[idx]]  # 선택된 스냅샷 + emotion
-    print(emo_list)
+    snapshot = [dict_snapshots[idx], emo_list[idx]]  # [선택된 스냅샷, 그 스냅샷의 emotion]
     sec = idx*SEC
     return render(request, 'video_detail.html', {'video':video, 'snapshots':snapshots, 'snap':snapshot, 'sec':sec})
 
+# 홈페이지의 'clear db' 링크 버튼 클릭시 실행
 # db 내 FileModel objects
 # media/ 내 video 파일
 # snapshot3/static/snapshots/ 내 snapshot 파일들

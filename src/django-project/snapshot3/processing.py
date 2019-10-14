@@ -19,12 +19,32 @@ import os
 import numpy as np
 from django.conf import settings
 
+
+### 전역변수 선언
 protoFile = os.path.join(settings.MODEL_DIR, 'caffemodel', 'pose_deploy_linevec.prototxt')
 weightFile = os.path.join(settings.MODEL_DIR, 'caffemodel', 'pose_iter_440000.caffemodel')
-face_cascade = cv2.CascadeClassifier(os.path.join(settings.MODEL_DIR, 'harrs', 'haarcascade_frontalface_default.xml'))
 network = cv2.dnn.readNetFromCaffe(protoFile, weightFile)
 
 weight_path = os.path.join(settings.MODEL_DIR, 'emotion_detector_models', 'model_v6_23.hdf5')
+
+face_cascade = cv2.CascadeClassifier(os.path.join(settings.MODEL_DIR, 'harrs', 'haarcascade_frontalface_default.xml'))
+
+
+### 함수 선언
+# 각 snapshot 한장에 대한 scoring 
+def scoring(points, emotion):
+    score = 0
+
+    ## emotion 표정을 활용한 점수화 알고리즘
+    emotion_score = {'Angry': -1, 'Disgust': -1, 'Fear': -1, 'Happy': 1, 'Neutral': 1, 'Sad': -1, 'Surprise': 0}  # 임의 설정
+    score += emotion_score[emotion]  # 표정에 따른 점수
+
+    ## points_with_num 을 활용한 점수화 알고리즘
+    eyecount = countEyes(points)
+    score += 1 if eyecount==2 else -1
+
+    return score
+
 
 def countEyes(points):
     eyecount = 0
@@ -64,6 +84,8 @@ def load_model():
     
     return model
 
+# 'snapshot_image.py' 의 snapshot 함수 내에서 호출됨
+# frame 은 'SEC'초 마다 나오는 이미지 1장
 def getSkeleton(frame, isHarr=True):
     ### Inferencing Pose ###
     nPoints = 18
