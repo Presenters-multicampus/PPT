@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div id="main">
+        <div></div>
+        <h2>{{ video.title }}</h2>
+        {% if video.file %}
+            <img src="{{ video.file.url }}" alt="">
+            <video id="vid1" height="30%" controls>
+                <source src="{{video.file.url}}" type='video/mp4'>
+            </video>
+            {% if sec %}
+            <p>start: {{sec}} sec</p>
+            <script>
+                var vid = document.getElementById("vid1");
+                vid.onloadeddata = function() {
+                    vid.currentTime = "10";
+                    document.getElementById('vid1').currentTime = {{sec}};
+                };
+            </script>
+            {% endif %}
+        {% endif %}
+        {% if snapshots %}
+            <div id="mySidenav" class="sidenav">
+                {% for snapshot in snapshots %}
+                    <a href="/video/{{video.pk}}/{{snapshot.0}}"><img src="{% static snapshot.1 %}" width='85%'></a>
+                {% endfor %}
+            </div>
+            <div></div>
+            {% if snap %}
+                <img src="{% static snap.0 %}" height="30%">
+                <p>현재 감정: {{ snap.1 }}</p>
+                <p>발표 점수가 여기에 표시됩니다...</p>
+            {% endif %}
+        {% endif %}
+    </div>    
+{% endblock %}
