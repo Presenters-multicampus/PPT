@@ -37,7 +37,11 @@ def video_detail(request, pk):
     videoname = os.path.basename(video.file.url)  # 선택된 video name
     snaps_dir = os.path.join(settings.SNAPS_DIR, videoname)  # 선택된 video들의 snapshot 들이 저장되어 있는 디렉토리 경로
     snapshots = os.listdir(snaps_dir)  # 전체 snapshot 리스트
-    snapshots = sorted(snapshots[:-1], key=lambda x: int(x.split('.')[0]))
+    for file in snapshots:
+        ext = file.split('.')[1]
+        if ext=='txt':
+            snapshots.remove(file)
+    snapshots = sorted(snapshots, key=lambda x: int(x.split('.')[0]))
     snapshots = list(map(lambda x: os.path.join('snapshots', videoname, x), snapshots))  # 숫자 기준으로 정렬
 
     # [[index, snapshot], [index, snapshot], ... ] 형태의 리스트로 변환
@@ -52,7 +56,12 @@ def video_snapshot(request, pk, idx):
     videoname = os.path.basename(video.file.url)
     snaps_dir = os.path.join(settings.SNAPS_DIR, videoname)
     snapshots = os.listdir(snaps_dir)
-    snapshots = sorted(snapshots[:-1], key=lambda x: int(x.split('.')[0]))
+    for file in snapshots:
+        ext = file.split('.')[1]
+        if ext=='txt':
+            snapshots.remove(file)
+    print(snapshots)
+    snapshots = sorted(snapshots, key=lambda x: int(x.split('.')[0]))
     snapshots = list(map(lambda x: os.path.join('snapshots', videoname, x), snapshots))
     
     dict_snapshots = {index:snapshot for index, snapshot in enumerate(snapshots)}
