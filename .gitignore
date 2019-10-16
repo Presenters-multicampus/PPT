@@ -236,6 +236,7 @@ dmypy.json
 fer2013.csv
 
 ### trained model file ###
+*.hdf5
 *.h5
 
 # End of https://www.gitignore.io/api/video,python,pycharm,jupyternotebooks
