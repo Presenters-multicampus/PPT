@@ -144,7 +144,10 @@ def getSkeleton(frame, isHarr=True):
         label_dict = {'Angry': 0, 'Disgust': 1, 'Fear': 2, 'Happy': 3, 'Neutral': 4, 'Sad': 5, 'Surprise': 6}
         label_dict = {num:emotion for emotion, num in label_dict.items()}
         emotion = label_dict[np.argmax(model.predict(input_face))]
-    
+        
+        ## memory flush ##
+
+
     ### Draw points, lines, rectangle ###
     ### Pose estimation ###
     for i in range(nPoints):
