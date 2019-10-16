@@ -60,7 +60,7 @@ def snapshot(url, SEC=3):
     # ----------------
     with open(emo_path, 'w') as f:
         for e, s in zip(emo_list, all_score):
-            f.write(e + ',' + s)  # 나중에 split(',') 으로 나누기 [emotion, score]
+            f.write(str(e) + ',' + str(s))  # 나중에 split(',') 으로 나누기 [emotion, score]
             f.write('\n')
 
 

@@ -36,7 +36,7 @@ def scoring(points, emotion):
     score = 0
 
     ## emotion 표정을 활용한 점수화 알고리즘
-    emotion_score = {'Angry': -1, 'Disgust': -1, 'Fear': -1, 'Happy': 1, 'Neutral': 1, 'Sad': -1, 'Surprise': 0}  # 임의 설정
+    emotion_score = {'Angry': -1, 'Disgust': -1, 'Fear': -1, 'Happy': 1, 'Neutral': 1, 'Sad': -1, 'Surprise': 0, 'None':0}  # 임의 설정
     score += emotion_score[emotion]  # 표정에 따른 점수
 
     ## points_with_num 을 활용한 점수화 알고리즘
