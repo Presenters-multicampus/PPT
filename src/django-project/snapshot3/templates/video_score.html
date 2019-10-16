@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div id="main">
+        <div></div>
+        <h2>{{ video.title }}</h2>
+        <br>
+        {% if video.file %}
+            <img src="{{ video.file.url }}" alt="">
+            <video id="vid1" height="30%" controls autoplay>
+                <source src="{{video.file.url}}" type='video/mp4'>
+            </video>
+        {% endif %}
+        {% if snapshots %}
+            <div id="mySidenav" class="sidenav">
+                {% for snapshot in snapshots %}
+                    <a href="/video/{{video.pk}}/{{snapshot.0}}"><img src="{% static snapshot.1 %}" width='85%'></a>
+                {% endfor %}
+            </div>
+            <br>
+            <div>
+                <br>
+                <!-- score 변수가 views.py 에서 feed 됐으면 생성 없으면 무시 -->
+                {% if score %} 
+                    <h3>최종 점수는</h3>
+                    <p><span style='font-size: 15pt; font-weight: bold;'>{{ score }}점</span> 입니다.</p>
+                {% endif %}
+                <br>
+                <!-- advice 변수가 views.py 에서 feed 됐으면 생성 없으면 무시 -->
+                {% if advice %}
+                    <h3>발표를 개선하기 위해선...</h3>
+                    <p>{{ advice }}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>    
+{% endblock %}
