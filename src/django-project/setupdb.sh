@@ -5,7 +5,7 @@ python3 -m venv env
 echo -e "\n 필요 패키지 설치중... \n"
 pip install django requests Pillow opencv-python
 pip install 'celery[redis]'
-pip install redis==2.10.6
+pip install redis
 
 pip list
 echo -e "\n 필요 패키지 설치 완료 \n"
