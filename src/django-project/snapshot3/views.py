@@ -6,6 +6,7 @@ from django.conf import settings
 import os, shutil
 from .tasks import snapshot_celery
 import pickle
+from .processing import *
 
 
 # Create your views here.
@@ -159,7 +160,7 @@ def video_score(request, pk):
 
     ### 여기서 scoring 하자 ###
 
-    final_score, final_advice = final_scoring(emo_list, point_list, score_list)
+    final_score, final_advice = total_scoring(emo_list, point_list, score_list)   
 
     ##########################
 
