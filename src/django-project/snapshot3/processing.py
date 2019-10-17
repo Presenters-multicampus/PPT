@@ -26,13 +26,14 @@ weightFile = os.path.join(settings.MODEL_DIR, 'caffemodel', 'pose_iter_440000.ca
 network = cv2.dnn.readNetFromCaffe(protoFile, weightFile)
 
 weight_path = os.path.join(settings.MODEL_DIR, 'emotion_detector_models', 'model_v6_23.hdf5')
+weight_path2 = os.path.join(settings.MODEL_DIR, 'emotion_detector_models', 'model_resnet_best_r2.hdf5')
 
 face_cascade = cv2.CascadeClassifier(os.path.join(settings.MODEL_DIR, 'harrs', 'haarcascade_frontalface_default.xml'))
 
 
 ### 함수 선언
 # 각 snapshot 한장에 대한 scoring 
-def scoring(points, emotion):
+def snapshot_scoring(points, emotion):
     score = 0
 
     ## emotion 표정을 활용한 점수화 알고리즘
@@ -44,6 +45,12 @@ def scoring(points, emotion):
     score += 1 if eyecount==2 else -1
 
     return score
+
+# 최종 스코어 계산 함수
+def total_scoring(points, emotion, scores):
+    final_score = 100
+    final_advice = '연습하세요'
+    return final_score, final_advice
 
 
 def countEyes(points):

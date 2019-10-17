@@ -5,22 +5,8 @@
     <div id="main">
         <div></div>
         <h2>{{ video.title }}</h2>
-        {% if video.file %}
-            <img src="{{ video.file.url }}" alt="">
-            <video id="vid1" height="30%" controls>
-                <source src="{{video.file.url}}" type='video/mp4'>
-            </video>
-            {% if sec %}
-            <p>start: {{sec}} sec</p>
-            <script>
-                var vid = document.getElementById("vid1");
-                vid.onloadeddata = function() {
-                    vid.currentTime = "10";
-                    document.getElementById('vid1').currentTime = {{sec}};
-                };
-            </script>
-            {% endif %}
-        {% endif %}
+        <button onclick="location.href=`{% url 'video_score' pk=video.pk %}`">Check Total Score</button>
+        
         {% if snapshots %}
             <div id="mySidenav" class="sidenav">
                 {% for snapshot in snapshots %}
@@ -28,10 +14,16 @@
                 {% endfor %}
             </div>
             <div></div>
-            {% if snap %}
-                <img src="{% static snap.0 %}" height="30%">
-                <p>현재 감정: {{ snap.1 }}</p>
-                <p>발표 점수가 여기에 표시됩니다...</p>
+            {% if snap_info %}
+                <img src="{% static snap_info.0 %}" height="30%">
+                <div></div>
+                <div>
+                    <h4>현재 스냅샷 평가</h4>
+                    <ul>
+                        <li><p><span style="font-weight: bold;">감정</span>: {{ snap_info.1 }}</p></li>
+                        <li><p><span style="font-weight: bold;">점수</span>: {{ snap_info.3 }}</p></li>
+                    </ul>
+                </div>
             {% endif %}
         {% endif %}
     </div>    

@@ -5,6 +5,8 @@ from .snapshot_image import snapshot
 from django.conf import settings
 import os, shutil
 from .tasks import snapshot_celery
+import pickle
+
 
 # Create your views here.
 SEC = 30  # 몇초마다 snapshot 할지 결정
@@ -36,11 +38,13 @@ def video_detail(request, pk):
     video = get_object_or_404(FileModel, pk=pk)
     videoname = os.path.basename(video.file.url)  # 선택된 video name
     snaps_dir = os.path.join(settings.SNAPS_DIR, videoname)  # 선택된 video들의 snapshot 들이 저장되어 있는 디렉토리 경로
-    snapshots = os.listdir(snaps_dir)  # 전체 snapshot 리스트
-    for file in snapshots:
+    files = os.listdir(snaps_dir)  # 전체 snapshot 폴더의 파일 리스트
+    snapshots = []
+    for file in files:
         ext = file.split('.')[1]
-        if ext=='txt':
-            snapshots.remove(file)
+        if ext=='jpg':
+            snapshots.append(file)
+    print(snapshots)
     snapshots = sorted(snapshots, key=lambda x: int(x.split('.')[0]))
     snapshots = list(map(lambda x: os.path.join('snapshots', videoname, x), snapshots))  # 숫자 기준으로 정렬
 
@@ -50,16 +54,17 @@ def video_detail(request, pk):
 
 # 클릭된 스냅샷 렌더링
 def video_snapshot(request, pk, idx):
-    idx = int(idx)
+    # idx = int(idx)
     # video_detail 과 동일
     video = get_object_or_404(FileModel, pk=pk)
     videoname = os.path.basename(video.file.url)
     snaps_dir = os.path.join(settings.SNAPS_DIR, videoname)
-    snapshots = os.listdir(snaps_dir)
-    for file in snapshots:
+    files = os.listdir(snaps_dir)  # 전체 snapshot 폴더의 파일 리스트
+    snapshots = []
+    for file in files:
         ext = file.split('.')[1]
-        if ext=='txt':
-            snapshots.remove(file)
+        if ext=='jpg':
+            snapshots.append(file)
     print(snapshots)
     snapshots = sorted(snapshots, key=lambda x: int(x.split('.')[0]))
     snapshots = list(map(lambda x: os.path.join('snapshots', videoname, x), snapshots))
@@ -69,24 +74,96 @@ def video_snapshot(request, pk, idx):
     # [[index, snapshot], [index, snapshot], ... ] 형태의 리스트로 변환
     snapshots = [[idx, snapshot] for idx, snapshot in enumerate(snapshots)]
 
-    # read snap_info.txt
-    # snapshot 함수에서 snap_info.txt 작성하고, 여기서 불러옵니다.
-    emo_list = []
-    sco_list = []
-    info_path = os.path.join(snaps_dir, 'snap_info.txt')
-    with open(info_path, 'r') as f:
-        while True:
-            line = f.readline()
-            if not line:
-                break
-            emo = line.split(',')[0].strip()
-            sco = line.split(',')[1].strip()
-            emo_list.append(emo)
-            sco_list.append(sco)
+    # read emo.pkl, point.pkl, score.pkl file
+    # snapshot 함수에서 emo.pkl, point.pkl, score.pkl 생성 후 여기서 불러옵니다.
+    # 경로 변수 선언
+    emo_path = os.path.join(snaps_dir, 'emo.pkl')
+    point_path = os.path.join(snaps_dir, 'point.pkl')
+    score_path = os.path.join(snaps_dir, 'score.pkl')
+    # pickle 로 불러오기
+    with open(emo_path, 'rb') as f:
+        # emo_list[0] --> 0번째 스냅샷의 emotion
+        emo_list = pickle.load(f)
 
-    snapshot = [dict_snapshots[idx], emo_list[idx]]  # [선택된 스냅샷, 그 스냅샷의 emotion]
+    with open(point_path, 'rb') as f:
+        # point_list[0] --> 0번째 스냅샷의 좌표 넘파이 배열 [[x, y, number, name], [x,y, number, name], ...]
+        point_list = pickle.load(f)  
+
+    with open(score_path, 'rb') as f:
+        # score_list[0] --> 0번째 스냅샷의 score
+        score_list = pickle.load(f)  
+
+    # video detail 창 들어가서, 좌측 이미지 클릭하면
+    # python manage.py runserver 실행한 프롬프트에서 확인 가능
+    print('+'*50)
+    print(emo_list)
+    print(point_list)
+    print(score_list)
+    print('+'*50)
+
+    # snap_info 설명
+    # snap_info[0]: 클릭된 스냅샷 이미지  --> (html) snap_info.0  이렇게 접근(장고 템플릿 html에선 리스트 원소를 '.' 으로 참조함)
+    # snap_info[1]: 클릭된 스냅샷 emotion  --> (html) snap_info.1
+    # snap_info[2]: 클릭된 스냅샷 좌표 numpy 배열  --> (html) snap_info.2
+    # snap_info[3]: 클릭된 스냅샷 score  --> (html) snap_info.3
+    snap_info = [dict_snapshots[idx], emo_list[idx], point_list[idx], score_list[idx]]
     sec = idx*SEC
-    return render(request, 'video_detail.html', {'video':video, 'snapshots':snapshots, 'snap':snapshot, 'sec':sec})
+    return render(request, 'video_detail.html', {'video':video, 'snapshots':snapshots, 'snap_info':snap_info, 'sec':sec})
+
+def video_score(request, pk):
+
+    video = get_object_or_404(FileModel, pk=pk)
+    videoname = os.path.basename(video.file.url)
+    snaps_dir = os.path.join(settings.SNAPS_DIR, videoname)
+    files = os.listdir(snaps_dir)  # 전체 snapshot 폴더의 파일 리스트
+    snapshots = []
+    for file in files:
+        ext = file.split('.')[1]
+        if ext=='jpg':
+            snapshots.append(file)
+    print(snapshots)
+    snapshots = sorted(snapshots, key=lambda x: int(x.split('.')[0]))
+    snapshots = list(map(lambda x: os.path.join('snapshots', videoname, x), snapshots))
+    
+    dict_snapshots = {index:snapshot for index, snapshot in enumerate(snapshots)}
+
+    # [[index, snapshot], [index, snapshot], ... ] 형태의 리스트로 변환
+    snapshots = [[idx, snapshot] for idx, snapshot in enumerate(snapshots)]
+
+    # read emo.pkl, point.pkl, score.pkl file
+    # snapshot 함수에서 emo.pkl, point.pkl, score.pkl 생성 후 여기서 불러옵니다.
+    # 경로 변수 선언
+    emo_path = os.path.join(snaps_dir, 'emo.pkl')
+    point_path = os.path.join(snaps_dir, 'point.pkl')
+    score_path = os.path.join(snaps_dir, 'score.pkl')
+    # pickle 로 불러오기
+    with open(emo_path, 'rb') as f:
+        # emo_list[0] --> 0번째 스냅샷의 emotion
+        emo_list = pickle.load(f)
+
+    with open(point_path, 'rb') as f:
+        # point_list[0] --> 0번째 스냅샷의 좌표 넘파이 배열 [[x, y, number, name], [x,y, number, name], ...]
+        point_list = pickle.load(f)  
+
+    with open(score_path, 'rb') as f:
+        # score_list[0] --> 0번째 스냅샷의 score
+        score_list = pickle.load(f)  
+
+    # video detail 창 들어가서, Check Total Score 클릭하면
+    # python manage.py runserver 실행한 프롬프트에서 확인 가능
+    print('+'*50)
+    print(emo_list)
+    print(point_list)
+    print(score_list)
+    print('+'*50)
+
+    ### 여기서 scoring 하자 ###
+
+    final_score, final_advice = final_scoring(emo_list, point_list, score_list)
+
+    ##########################
+
+    return render(request, 'video_score.html', {'video':video, 'snapshots':snapshots, 'score':final_score, 'advice':final_advice})
 
 # 홈페이지의 'clear db' 링크 버튼 클릭시 실행
 # db 내 FileModel objects
