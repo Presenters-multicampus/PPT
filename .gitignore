@@ -237,5 +237,6 @@ fer2013.csv
 
 ### trained model file ###
 *.h5
+*.hdf5
 
 # End of https://www.gitignore.io/api/video,python,pycharm,jupyternotebooks

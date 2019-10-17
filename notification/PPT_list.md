@@ -36,3 +36,18 @@
               "RAnkle": 10, "LHip": 11, "LKnee": 12, "LAnkle": 13, "REye": 14,
               "LEye": 15, "REar": 16, "LEar": 17, "Background": 18 }
 
+10.142.0.2
+
+- turn on command in PUTTY
+  - sudo $(which python) manage.py runserver 10.142.0.2:80 &
+  - sudo $(which celery) -A core worker -l info --soft-time-limit 20
+
+
+
+- file move by using txt file or pickle
+  - 템플릿과 view를 봐라
+
+
+
+- emotion model 교체
+- 매 사진 snapshot마다 

@@ -9,6 +9,7 @@ caffemodel/
 db.sqlite3
 migrations/
 /media/
+dump.rdb
 
 ### Code ###
 .vscode/*
