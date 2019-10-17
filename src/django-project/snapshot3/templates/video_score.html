@@ -29,8 +29,19 @@
                 <br>
                 <!-- advice 변수가 views.py 에서 feed 됐으면 생성 없으면 무시 -->
                 {% if advice %}
+                    <p>긍정적인 표정은 전체 표정의 {{ advice.0 }}% 입니다.</p>
+                    <p>부정적인 표정은 전체 표정의 {{ advice.1 }}% 입니다.</p>
+                    <p>중립적인 표정은 전체 표정의 {{ advice.2 }}% 입니다.</p>
+                    <p>등은 평균 {{ advice.5 }}도 기울어져 있었습니다.</p>
+                    <p>어깨는 평균 {{ advice.7 }}도 기울어져 있었습니다.</p>
+                    <p>엉덩이는 평균 {{ advice.8 }}도 기울어져 있었습니다.</p>
                     <h3>발표를 개선하기 위해선...</h3>
-                    <p>{{ advice }}</p>
+                    <p>{{ advice.3 }}</p>
+                    <p>{{ advice.4 }}</p>
+                    <p>{{ advice.6 }}</p>
+                    <p>{{ advice.9 }}</p>
+                    <p>{{ advice.10 }}</p>
+                    
                 {% endif %}
             </div>
         {% endif %}

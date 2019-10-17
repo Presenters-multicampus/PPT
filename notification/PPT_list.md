@@ -40,7 +40,7 @@
 
 - turn on command in PUTTY
   - sudo $(which python) manage.py runserver 10.142.0.2:80 &
-  - sudo $(which celery) -A core worker -l info --soft-time-limit 20
+  - sudo $(which celery) -A core worker -l info
 
 
 
@@ -51,3 +51,13 @@
 
 - emotion model 교체
 - 매 사진 snapshot마다 
+
+
+
+- 오늘 할것 : 알고리즘 전체 구현
+  - 구현할 때에 : 각 페이지에 보여줄 알고리즘 / 전체 total score에서 보여줄 알고리즘을 따로
+  - 따로 함수로 구현
+- 모델 변경 : CNN => resnet (emotion) / face recognition : harr => DNN : ok
+- 적용 - deploy
+- workflow에 위반되게 했으므로 : git remote add downstream https://github.com/gtpgg1013/PPT.git
+- 추가하고 거기에다가 추가 저장하는 식으로 하자.

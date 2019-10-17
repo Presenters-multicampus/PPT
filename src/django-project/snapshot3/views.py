@@ -88,7 +88,10 @@ def video_snapshot(request, pk, idx):
 
     with open(point_path, 'rb') as f:
         # point_list[0] --> 0번째 스냅샷의 좌표 넘파이 배열 [[x, y, number, name], [x,y, number, name], ...]
-        point_list = pickle.load(f)  
+        point_list = pickle.load(f)
+
+    # list형식 => dict형식
+    point_list = li2dict(point_list)
 
     with open(score_path, 'rb') as f:
         # score_list[0] --> 0번째 스냅샷의 score
@@ -108,6 +111,24 @@ def video_snapshot(request, pk, idx):
     # snap_info[2]: 클릭된 스냅샷 좌표 numpy 배열  --> (html) snap_info.2
     # snap_info[3]: 클릭된 스냅샷 score  --> (html) snap_info.3
     snap_info = [dict_snapshots[idx], emo_list[idx], point_list[idx], score_list[idx]]
+    # snap_info[4]: 스냅샷의 눈에 따른 어드바이스 --> (html) snap_info.4
+    current_points = point_list[idx]
+    snap_info.append(eyeAdvice(countEyes(current_points)))
+    # snap_info[5]: 스냅샷의 허리 각도 --> (html) snap_info.5
+    snap_info.append(standAdvice(checkStandingStraight(current_points))[0])
+    # snap_info[6]: 스냅샷의 허리 어드바이스 --> (html) snap_info.6
+    snap_info.append(standAdvice(checkStandingStraight(current_points))[1])
+    # snap_info[7]: 스냅샷의 어깨가 삐딱한 각도 --> (html) snap_info.7
+    snap_info.append(balanceAdvice(checkLeftRightBalance(current_points))[0])
+    # snap_info[8]: 스냅샷의 엉덩이가 삐딱한 각도 --> (html) snap_info.8
+    snap_info.append(balanceAdvice(checkLeftRightBalance(current_points))[1])
+    # snap_info[9]: 자세 기울어짐 어드바이스 --> (html) snap_info.9
+    snap_info.append(balanceAdvice(checkLeftRightBalance(current_points))[2])
+    # snap_info[10]: 팔 꼼 어드바이스 --> (html) snap_info.10
+    snap_info.append(crossArmsAdvice(checkCrossArms(current_points)))
+    # snap_info[11]: 머리위 손 어드바이스 --> (html) snap_info.11
+    snap_info.append(putHandOnHeadAdvice(checkPutHandsOnHead(current_points)))    
+
     sec = idx*SEC
     return render(request, 'video_detail.html', {'video':video, 'snapshots':snapshots, 'snap_info':snap_info, 'sec':sec})
 
@@ -144,7 +165,10 @@ def video_score(request, pk):
 
     with open(point_path, 'rb') as f:
         # point_list[0] --> 0번째 스냅샷의 좌표 넘파이 배열 [[x, y, number, name], [x,y, number, name], ...]
-        point_list = pickle.load(f)  
+        point_list = pickle.load(f)
+
+    # list형식 => dict형식
+    point_list = li2dict(point_list)
 
     with open(score_path, 'rb') as f:
         # score_list[0] --> 0번째 스냅샷의 score
@@ -160,11 +184,36 @@ def video_score(request, pk):
 
     ### 여기서 scoring 하자 ###
 
-    final_score, final_advice = total_scoring(emo_list, point_list, score_list)   
+    final_advices = []
+    # final_advices[0]: 긍정적인 표정 비율 --> (html) final_advices.0
+    final_advices.append({'0.2f'}.format(countEmotions(emo_list)[0] * 100))
+    # final_advices[1]: 부정적인 표정 비율 --> (html) final_advices.1
+    final_advices.append({'0.2f'}.format(countEmotions(emo_list)[1] * 100))
+    # final_advices[2]: 중립적인 표정 비율 --> (html) final_advices.2
+    final_advices.append({'0.2f'}.format(countEmotions(emo_list)[2] * 100))
+    # final_advices[3]: eye 어드바이스 --> (html) final_advices.3
+    final_advices.append(eyeAdvice(countTotalEyes(point_list)))
+    # final_advices[4]: 팔 어드바이스 --> (html) final_advices.4
+    final_advices.append(adviceHandMoving_group(checkHandMoving(point_list)))
+    # final_advices[5]: 허리 자세 평균 각도 --> (html) final_advices.5
+    final_advices.append(adviceStandingStraight_group(checkStandingStraight_group(point_list))[0])
+    # final_advices[6]: 허리 자세 조언 --> (html) final_advices.6
+    final_advices.append(adviceStandingStraight_group(checkStandingStraight_group(point_list))[1])
+    # final_advices[7]: 어깨 자세 평균 각도 --> (html) final_advices.7
+    final_advices.append(adviceLeftRightBalance_group(checkLeftRightBalance_group(point_list))[0])
+    # final_advices[8]: 엉덩이 자세 평균 각도 --> (html) final_advices.8
+    final_advices.append(adviceLeftRightBalance_group(checkLeftRightBalance_group(point_list))[1])
+    # final_advices[9]: 기울어짐 자세 조언 --> (html) final_advices.9
+    final_advices.append(adviceLeftRightBalance_group(checkLeftRightBalance_group(point_list))[2])
+    # final_advices[10]: 팔짱낀 자세 --> (html) final_advices.10
+    final_advices.append(adviceCrossArms_group(checkCrossArms_group(point_list)))
+
+
+    # final_score, final_advice = total_scoring(emo_list, point_list, score_list)   
 
     ##########################
 
-    return render(request, 'video_score.html', {'video':video, 'snapshots':snapshots, 'score':final_score, 'advice':final_advice})
+    return render(request, 'video_score.html', {'video':video, 'snapshots':snapshots, 'score':final_score, 'advice':final_advices})
 
 # 홈페이지의 'clear db' 링크 버튼 클릭시 실행
 # db 내 FileModel objects
