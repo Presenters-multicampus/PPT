@@ -25,6 +25,9 @@ protoFile = os.path.join(settings.MODEL_DIR, 'caffemodel', 'pose_deploy_linevec.
 weightFile = os.path.join(settings.MODEL_DIR, 'caffemodel', 'pose_iter_440000.caffemodel')
 network = cv2.dnn.readNetFromCaffe(protoFile, weightFile)
 
+face_protoFile = os.path.join(settings.MODEL_DIR, 'caffemodel', 'deploy.prototxt')
+face_weightFile = os.path.join(settings.MODEL_DIR, 'caffemodel', 'res10_300x300_ssd_iter_140000.caffemodel')
+
 weight_path = os.path.join(settings.MODEL_DIR, 'emotion_detector_models', 'model_v6_23.hdf5')
 weight_path2 = os.path.join(settings.MODEL_DIR, 'emotion_detector_models', 'model_resnet_best_r2.hdf5')
 
@@ -32,7 +35,42 @@ face_cascade = cv2.CascadeClassifier(os.path.join(settings.MODEL_DIR, 'harrs', '
 
 
 ### 함수 선언
-# 각 snapshot 한장에 대한 scoring 
+# 각 snapshot 한장에 대한 scoring
+def personDetector(frame, pf=face_protoFile, wf=face_weightFile):
+    global startX, endX, startY, endY
+    net = cv2.dnn.readNetFromCaffe(pf,wf)
+    
+    (h, w) = frame.shape[:2]
+    blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0))
+    
+    net.setInput(blob)
+    detections = net.forward()
+    
+    # loop over the detections
+    for i in range(0, detections.shape[2]):
+        # extract the confidence (i.e., probability) associated with the
+        # prediction
+        confidence = detections[0, 0, i, 2]
+
+        # filter out weak detections by ensuring the `confidence` is
+        # greater than the minimum confidence
+        if confidence > 0.5:
+            # compute the (x, y)-coordinates of the bounding box for the
+            # object
+            box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+            (startX, startY, endX, endY) = box.astype("int")
+
+            # draw the bounding box of the face along with the associated
+            # probability
+            text = "{:.2f}%".format(confidence * 100)
+            y = startY - 10 if startY - 10 > 10 else startY + 10
+            cv2.rectangle(frame, (startX, startY), (endX, endY),
+                (0, 0, 255), 2)
+            cv2.putText(frame, text, (startX, y),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+
+    return frame, (startX, startY, endX-startX, endY-startY)
+
 def snapshot_scoring(points, emotion):
     score = 0
 
@@ -93,7 +131,7 @@ def load_model():
 
 # 'snapshot_image.py' 의 snapshot 함수 내에서 호출됨
 # frame 은 'SEC'초 마다 나오는 이미지 1장
-def getSkeleton(frame, isHarr=True):
+def getSkeleton(frame, isHarr=False):
     ### Inferencing Pose ###
     nPoints = 18
     POSE_PAIRS = [ [1,0],[1,2],[1,5],[2,3],[3,4],[5,6],\
@@ -134,11 +172,8 @@ def getSkeleton(frame, isHarr=True):
         facelist = face_cascade.detectMultiScale(gray, 1.3, 5)
         facelist = list(np.array(facelist).flatten())[:4]
     else:
-        import dlib
-        hogFaceDetector = dlib.get_frontal_face_detector()
-        faceRects = hogFaceDetector(frame, 0)
-        facelist = [faceRects[0].left(),faceRects[0].top(),\
-                                              faceRects[0].right()-faceRects[0].left(), faceRects[0].bottom()-faceRects[0].top()]
+        facelist = personDetector(frame)[1]
+        facelist = list(np.array(facelist).flatten())
     
     emotion = 'None'  # 초기값 None 이 아니라 string 이어야 합니다.
     if len(facelist)!=0:
@@ -188,9 +223,9 @@ def getSkeleton(frame, isHarr=True):
             cv2.line(frame, points[partA], points[partB], (0,255,255), linesize)
     
     ### Draw Face box and emotion ###
-    if len(facelist)!=0:
-        cv2.rectangle(frame, (int(fx),int(fy)),(int(fx+fw),int(fy+fh)),(0,255,0), linesize)
-        cv2.rectangle(frameCopy, (int(fx),int(fy)),(int(fx+fw),int(fy+fh)),(0,255,0), linesize)
+    #if len(facelist)!=0:
+     #   cv2.rectangle(frame, (int(fx),int(fy)),(int(fx+fw),int(fy+fh)),(0,255,0), linesize)
+      #  cv2.rectangle(frameCopy, (int(fx),int(fy)),(int(fx+fw),int(fy+fh)),(0,255,0), linesize)
     
     img_skeleton = frame
     img_with_dot = frameCopy

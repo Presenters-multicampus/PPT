@@ -5,15 +5,20 @@ from .snapshot_image import snapshot
 from celery.exceptions import SoftTimeLimitExceeded
 from keras import backend as K
 
-@shared_task(time_limit=60)
-#@app.task(time_limit=60)
+@shared_task
 def snapshot_celery(url, SEC):
-    try:
-        save_dir = snapshot(url, SEC)
-        return save_dir
-    except SofttimeLimitExceeded:
-        print('clear memory')
-        K.clear_session()
+    save_dir = snapshot(url, SEC)
+    return save_dir
+
+#@shared_task(time_limit=60)
+#@app.task(time_limit=60)
+#def snapshot_celery(url, SEC):
+#    try:
+#        save_dir = snapshot(url, SEC)
+#        return save_dir
+#    except SoftTimeLimitExceeded:
+#       print('clear memory')
+#        K.clear_session()
     # click_command = "celery"
     # click_time = timezone.now()
     # done_time = timezone.now()
