@@ -16,18 +16,25 @@
 
 
 
+
 <br>
 
 
 
 ## Used Library
 
+- Programming Language
+  - Python
+- Deep Learning Framework
+  - Keras
 - Image Preprocessing
   - OpenCV
 - Object Detection
-  - Haar Cascades
-  - YOLO
-
+  - OpenPose
+- Web Framework
+  - Django
+- Deployment
+  - Google Cloud Platform
 
 
 <br>

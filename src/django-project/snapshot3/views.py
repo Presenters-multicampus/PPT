@@ -10,7 +10,7 @@ from .processing import *
 
 
 # Create your views here.
-SEC = 30  # 몇초마다 snapshot 할지 결정
+SEC = 10  # 몇초마다 snapshot 할지 결정
 
 # 홈 페이지 렌더링
 def home(request):
@@ -91,7 +91,7 @@ def video_snapshot(request, pk, idx):
         point_list = pickle.load(f)
 
     # list형식 => dict형식
-    point_list = li2dict(point_list)
+    point_list = list(li2dict(point_list))
 
     with open(score_path, 'rb') as f:
         # score_list[0] --> 0번째 스냅샷의 score
@@ -115,12 +115,19 @@ def video_snapshot(request, pk, idx):
     current_points = point_list[idx]
     snap_info.append(eyeAdvice(countEyes(current_points)))
     # snap_info[5]: 스냅샷의 허리 각도 --> (html) snap_info.5
-    snap_info.append(standAdvice(checkStandingStraight(current_points))[0])
+    if isinstance(standAdvice(checkStandingStraight(current_points))[0], float):
+        snap_info.append('{0:.02f}'.format(float(standAdvice(checkStandingStraight(current_points))[0])))
+    else:
+        snap_info.append(standAdvice(checkStandingStraight(current_points))[0])
+
     # snap_info[6]: 스냅샷의 허리 어드바이스 --> (html) snap_info.6
     snap_info.append(standAdvice(checkStandingStraight(current_points))[1])
     # snap_info[7]: 스냅샷의 어깨가 삐딱한 각도 --> (html) snap_info.7
-    snap_info.append(balanceAdvice(checkLeftRightBalance(current_points))[0])
-    # snap_info[8]: 스냅샷의 엉덩이가 삐딱한 각도 --> (html) snap_info.8
+    if isinstance(standAdvice(checkLeftRightBalance(current_points))[0], float):
+        snap_info.append('{0:.02f}'.format(float(balanceAdvice(checkLeftRightBalance(current_points))[0])))
+    else:
+        snap_info.append('관측 실패')
+                
     snap_info.append(balanceAdvice(checkLeftRightBalance(current_points))[1])
     # snap_info[9]: 자세 기울어짐 어드바이스 --> (html) snap_info.9
     snap_info.append(balanceAdvice(checkLeftRightBalance(current_points))[2])
@@ -168,7 +175,7 @@ def video_score(request, pk):
         point_list = pickle.load(f)
 
     # list형식 => dict형식
-    point_list = li2dict(point_list)
+    point_list = list(li2dict(point_list))
 
     with open(score_path, 'rb') as f:
         # score_list[0] --> 0번째 스냅샷의 score
@@ -186,30 +193,39 @@ def video_score(request, pk):
 
     final_advices = []
     # final_advices[0]: 긍정적인 표정 비율 --> (html) final_advices.0
-    final_advices.append({'0.2f'}.format(countEmotions(emo_list)[0] * 100))
+    if isinstance(countEmotions(emo_list[1][0]), float):
+        final_advices.append('{0:.2f}'.format(float(countEmotions(emo_list)[1][0]) * 100))
+    else:
+        final_advices.append(countEmotions(emo_list)[1][0])
     # final_advices[1]: 부정적인 표정 비율 --> (html) final_advices.1
-    final_advices.append({'0.2f'}.format(countEmotions(emo_list)[1] * 100))
+    if isinstance(countEmotions(emo_list[1][1]), float):
+        final_advices.append('{0:.2f}'.format(float(countEmotions(emo_list)[1][1]) * 100))
+    else:
+        final_advices.append(countEmotions(emo_list)[1][1])
     # final_advices[2]: 중립적인 표정 비율 --> (html) final_advices.2
-    final_advices.append({'0.2f'}.format(countEmotions(emo_list)[2] * 100))
+    if isinstance(countEmotions(emo_list[1][1]), float):
+        final_advices.append('{0:.2f}'.format(float(countEmotions(emo_list)[1][2]) * 100))
+    else:
+        final_advices.append(countEmotions(emo_list)[1][2])
     # final_advices[3]: eye 어드바이스 --> (html) final_advices.3
-    final_advices.append(eyeAdvice(countTotalEyes(point_list)))
+    final_advices.append(eyeAdvice_group(countTotalEyes(point_list)))
     # final_advices[4]: 팔 어드바이스 --> (html) final_advices.4
     final_advices.append(adviceHandMoving_group(checkHandMoving(point_list)))
     # final_advices[5]: 허리 자세 평균 각도 --> (html) final_advices.5
-    final_advices.append(adviceStandingStraight_group(checkStandingStraight_group(point_list))[0])
+    final_advices.append('{0:.2f}'.format(float(adviceStandingStraight_group(checkStandingStraight_group(point_list))[0])))
     # final_advices[6]: 허리 자세 조언 --> (html) final_advices.6
     final_advices.append(adviceStandingStraight_group(checkStandingStraight_group(point_list))[1])
     # final_advices[7]: 어깨 자세 평균 각도 --> (html) final_advices.7
-    final_advices.append(adviceLeftRightBalance_group(checkLeftRightBalance_group(point_list))[0])
+    final_advices.append('{0:.2f}'.format(float(adviceLeftRightBalance_group(checkLeftRightBalance_group(point_list))[0])))
     # final_advices[8]: 엉덩이 자세 평균 각도 --> (html) final_advices.8
-    final_advices.append(adviceLeftRightBalance_group(checkLeftRightBalance_group(point_list))[1])
+    final_advices.append('{0:.2f}'.format(float(adviceLeftRightBalance_group(checkLeftRightBalance_group(point_list))[1])))
     # final_advices[9]: 기울어짐 자세 조언 --> (html) final_advices.9
     final_advices.append(adviceLeftRightBalance_group(checkLeftRightBalance_group(point_list))[2])
     # final_advices[10]: 팔짱낀 자세 --> (html) final_advices.10
     final_advices.append(adviceCrossArms_group(checkCrossArms_group(point_list)))
 
 
-    # final_score, final_advice = total_scoring(emo_list, point_list, score_list)   
+    final_score = int(total_scoring(point_list, emo_list))
 
     ##########################
 

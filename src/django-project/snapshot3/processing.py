@@ -57,7 +57,7 @@ def personDetector(frame, pf=face_protoFile, wf=face_weightFile):
 
         # filter out weak detections by ensuring the `confidence` is
         # greater than the minimum confidence
-        if confidence > 0.5:
+        if confidence > 0.7:
             # compute the (x, y)-coordinates of the bounding box for the
             # object
             box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
@@ -71,8 +71,10 @@ def personDetector(frame, pf=face_protoFile, wf=face_weightFile):
                 (0, 0, 255), 2)
             cv2.putText(frame, text, (startX, y),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
-
-    return frame, (startX, startY, endX-startX, endY-startY)
+    try:
+        return frame, (startX, startY, endX-startX, endY-startY)
+    except:
+        return frame, []
 
 # list => dict
 def li2dict(points_list):
@@ -84,36 +86,43 @@ def li2dict(points_list):
 
 # 각 emotion의 등장 횟수 및 pos / neg의 percent 제공
 def countEmotions(emotions):
-    label_dict = {'Angry':'negative', 'Disgust':'negative', 'Fear':'negative', 'Happy':'positive', \
-                  'Neutral':'neutral', 'Sad':'negative', 'Surprise':'positive', 'None':'neutral'}
-    emotion_counts = {'positive' : 0, 'negative' : 0, 'neutral' : 0}
+  #  label_dict = {'Angry':'negative', 'Disgust':'negative', 'Fear':'negative', 'Happy':'positive', \
+   #               'Neutral':'neutral', 'Sad':'negative', 'Surprise':'positive', 'None':'neutral'}
+    emotion_counts = [0,0,0] # pos / neg / nut
     for emotion in emotions:
-        emotion_counts[label_dict[emotion]] += 1
+        print(emotion)
+        if emotion == 'Angry' or emotion == 'Disgust' or emotion == 'Fear' \
+                or emotion ==  'Sad':
+            emotion_counts[1] += 1
+        elif emotion == 'Happy' or emotion == 'Surprise':
+            emotion_counts[0] += 1
+        else:
+            emotion_counts[2] += 1
         
-    sum_emo_cnt = emotion_counts['positive'] + emotion_counts['negative'] + \
-                    emotion_counts['neutral']
+    sum_emo_cnt = emotion_counts[0] + emotion_counts[1] + \
+                    emotion_counts[2]
     
-    per_pos = emotion_counts['positive'] / sum_emo_cnt
-    per_neg = emotion_counts['negative'] / sum_emo_cnt
-    per_neut = emotion_counts['neutral'] /sum_emo_cnt
+    per_pos = emotion_counts[0] / sum_emo_cnt
+    per_neg = emotion_counts[1] / sum_emo_cnt
+    per_neut = emotion_counts[2] /sum_emo_cnt
     
     return emotion_counts, (per_pos, per_neg, per_neut)
 
-# def snapshot_scoring(points, emotion):
-#     score = 0
+def snapshot_scoring(points, emotion):
+     score = 0
 
-#     ## emotion 표정을 활용한 점수화 알고리즘
-#     emotion_score = {'Angry': -1, 'Disgust': -1, 'Fear': -1, 'Happy': 1, 'Neutral': 1, 'Sad': -1, 'Surprise': 0, 'None':0}  # 임의 설정
-#     score += emotion_score[emotion]  # 표정에 따른 점수
+     ## emotion 표정을 활용한 점수화 알고리즘
+     emotion_score = {'Angry': -1, 'Disgust': -1, 'Fear': -1, 'Happy': 1, 'Neutral': 1, 'Sad': -1, 'Surprise': 0, 'None':0}  # 임의 설정
+     score += emotion_score[emotion]  # 표정에 따른 점수
+     ## points_with_num 을 활용한 점수화 알고리즘
+     eyecount = countEyes(points)
+     score += 1 if eyecount==2 else -1
 
-#     ## points_with_num 을 활용한 점수화 알고리즘
-#     eyecount = countEyes(points)
-#     score += 1 if eyecount==2 else -1
-
-#     return score
+     return score
 
 ### 눈 관련 함수
 def countEyes(points):
+    points = dict(points)
     eyecount = 0
     if 14 in points.keys() :
         eyecount += 1
@@ -210,7 +219,7 @@ def checkHandMoving(points_list, save_path='./'):
 def adviceHandMoving_group(input_advice):
     rMove = (input_advice[1][1] + input_advice[2][1]) / input_advice[0][1]
     lMove = (input_advice[4][1] + input_advice[5][1]) / input_advice[3][1]
-    if rMove + lMove < 10:
+    if rMove + lMove < 5:
         return '몸이 너무 경직되어 있어요! 제스처를 좀 더 사용해 보는 건 어떨까요?'
     else:
         return '제스처를 적절히 사용하여 발표했어요!'
@@ -232,7 +241,7 @@ def checkStandingStraight(points):
         val = math.sqrt(math.pow(mp[0]-neck[0],2) + math.pow(mp[1]-neck[1],2))
         cos = abs(mp[1]-neck[1]) / val
         rad = math.acos(cos)
-        if rad * 57.296 < 5:
+        if rad * 57.296 < 3:
             is_straight = True
         return (True, rad * 57.296, is_straight) # exist, degree, straight or not
     else:
@@ -262,7 +271,7 @@ def checkStandingStraight_group(points_list):
     return res_list / res_list[0]
 
 def adviceStandingStraight_group(input_advice):
-    if input_advice[2] < 0.8:
+    if input_advice[2] < 0.9:
         return (input_advice[1], '전체적으로 허리를 더 펴는 것이 좋습니다!')
     else:
         return (input_advice[1], '곧은 자세로 잘 발표하였습니다!')
@@ -392,8 +401,9 @@ def checkPutHandsOnHead_group(points_list):
 # 최종 스코어 계산 함수
 def total_scoring(points_list, emo_list):
     final_score = 0
-    final_score += countEmotions(emo_list)[0] * 30
-    final_score += countTotalEyes(points_list)[3] * 40
+    print(countEmotions(emo_list))
+    final_score += countEmotions(emo_list)[1][0] * 40
+    final_score += countTotalEyes(points_list)[2] * 40
     if adviceHandMoving_group(checkHandMoving(points_list)) == '제스처를 적절히 사용하여 발표했어요!':
         final_score += 30
     else:
@@ -630,8 +640,12 @@ def getSkeleton(frame, isHarr=False):
         facelist = list(np.array(facelist).flatten())
     
     emotion = 'None'  # 초기값 None 이 아니라 string 이어야 합니다.
+    print('here')
+    print(facelist)
     if len(facelist)!=0:
         (fx,fy,fw,fh) = list(map(int,facelist))
+        print(frame.shape)
+        print(frame[fy:fy+fh, fx:fx+fw])
         # print(type(fx),type(fy),type(fw),type(fh))
         face = cv2.cvtColor(frame[fy:fy+fh, fx:fx+fw], cv2.COLOR_BGR2GRAY)
         face = cv2.resize(face, dsize=(48, 48), interpolation=cv2.INTER_LINEAR)

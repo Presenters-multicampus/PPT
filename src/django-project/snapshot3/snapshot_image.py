@@ -39,7 +39,7 @@ def snapshot(url, SEC=3):
             ## getSkeleton funcion call in 'preprocessing.py'
             img_skeleton, img_with_dot, points_with_num, emotion = getSkeleton(frame)
 
-            current_score = snapshot_scoring(points_with_num, emotion)  # scoring function call
+            current_score = 0  # scoring function call
 
             name = os.path.join(save_dir, f'{str(cf)}.jpg')  # ex) '100.jpg'
             print(f'Creating... {name}')
